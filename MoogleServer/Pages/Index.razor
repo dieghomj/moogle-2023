@@ -1,5 +1,4 @@
 ﻿@page "/"
-
 <PageTitle>Moogle!</PageTitle>
 
 <h1>🔍 Moogle!</h1>
@@ -10,7 +9,7 @@
 
 @if (!string.IsNullOrEmpty(result.Suggestion)) {
     <div class="suggestion">
-        <p>¿Quisite decir <strong><a href="#">@result.Suggestion</a></strong>?</p>
+        <p>¿Quisiste decir <strong><a href="#">@result.Suggestion</a></strong>?</p>
     </div>
 }
 
@@ -26,10 +25,13 @@
 </ul>
 
 @code {
+
     private string query = "";
     private SearchResult result = new SearchResult();
 
+    public (MoogleEngine.Algebra.Matrix,Dictionary<string,int>) DB = new Documents("../Content/").GetDB;
+
     private void RunQuery() {
-        result = Moogle.Query(query);
+        result = Moogle.Query(query,DB);
     }
 }
