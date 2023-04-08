@@ -20,14 +20,14 @@ namespace MoogleEngine
             this.path = path;
             int documents = 0;
             
-            this.Vocabulary = GetVocabulary();
             this.directory = ReadDocuments(this.path);
+            this.Vocabulary = GetVocabulary();
 
             foreach( string file in this.directory)documents++;
             this.documents = documents;
             
-            TF = new Matrix(this.documents+1,this.words+1);
-            IDF = new Vector(new double[words+1]);
+            this.TF = new Matrix(this.documents+1,this.words+1);
+            this.IDF = new Vector(new double[words+1]);
 
             this.ComputeDocuments();
 
@@ -43,18 +43,18 @@ namespace MoogleEngine
 
                 int document = 0;
 
-                string text = ReadText(this.path);
-                text = NormalForm(text);
-
-                Vector tf = CalculateTF(text,Vocabulary);
+                string text = ReadText(file);
+                string[] words = GetWords(text);
+ 
+                Vector tf = CalculateTF(words,Vocabulary);
 
                 for(int i = 0; i < this.words+1; i++){
                     TF[document,i] = tf[i];
                 }
 
-                bool[] idf = WordsInDoc(text,Vocabulary);
+                bool[] idf = WordsInDoc(words,Vocabulary);
 
-                for(int i = 0; i < words; i++){
+                for(int i = 0; i < this.words + 1; i++){
                     if(idf[i])IDF[i]++;
                 }
             
@@ -85,17 +85,14 @@ namespace MoogleEngine
 
             foreach( string file in directory){
                 
-                string text = ReadText(path);
-                
-                text = NormalForm(text);
-
-                string[] words = text.Split(' ',StringSplitOptions.RemoveEmptyEntries);
+                string text = ReadText(file);
+                string[] words = GetWords(text);
                 
                 foreach(string word in words){
-                    if(Vocabulary.ContainsKey(word))continue;
+                    if(Vocabulary.ContainsKey(NormalForm(word)))continue;
                     else {
                 
-                        Vocabulary.Add(word,cnt++);
+                        Vocabulary.Add(NormalForm(word),cnt++);
                         
                     }
                 }
@@ -112,16 +109,12 @@ namespace MoogleEngine
             get{ return (TF,Vocabulary); }
         }
 
-        public static Vector CalculateTF( string text, Dictionary<string,int> vocabulary){
+        public static Vector CalculateTF( string[] words, Dictionary<string,int> vocabulary){
             
             double[] A = new double[vocabulary.Count+1];
-            
-            text = NormalForm(text);
-
-            string[] words = text.Split(' ',StringSplitOptions.RemoveEmptyEntries);
 
             foreach(string word in words){
-                A[vocabulary[word]]++;
+                A[vocabulary[NormalForm(word)]]++;
             }
 
             return new Vector(A);
@@ -132,18 +125,15 @@ namespace MoogleEngine
            return 0.5f + 0.5f * (tf/max);
         }
 
-        public static bool[] WordsInDoc(string text, Dictionary<string,int> vocabulary){
+        public static bool[] WordsInDoc(string[] words, Dictionary<string,int> vocabulary){
                 
             bool[] IsInDoc = new bool[vocabulary.Count+1];
-            
-            text = NormalForm(text);
-            string[] words = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             foreach(string word in words){
                 
-                if(!IsInDoc[vocabulary[word]]){
+                if(!IsInDoc[vocabulary[NormalForm(word)]]){
                 
-                    IsInDoc[vocabulary[word]]=true;
+                    IsInDoc[vocabulary[NormalForm(word)]]=true;
                 
                 }
 
@@ -156,7 +146,7 @@ namespace MoogleEngine
         public static Vector CalculateTFIDF(){return new Vector(0);}
 
         private static string[] ReadDocuments(string path){
-            return Directory.GetDirectories(path,"*.txt");
+            return Directory.GetFiles(path,"*.txt");
         }
         private static string ReadText(string path){
             return File.ReadAllText(path,System.Text.Encoding.UTF8);
@@ -167,6 +157,11 @@ namespace MoogleEngine
             s = Regex.Replace(s.Normalize( System.Text.NormalizationForm.FormD),@"[^a-zA-z0-9]+","");
             s = Regex.Replace(s,@"[.,;:?!`¨'¡-]?",string.Empty);
             return s;
+        }
+
+        private static string[] GetWords(string text){
+            char[] separator = { ' ', '\n', '\r', '\t', '\v', '\b', '\f'};
+            return text.Split(separator,StringSplitOptions.RemoveEmptyEntries);
         }
 
     }
