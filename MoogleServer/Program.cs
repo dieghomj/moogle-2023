@@ -15,6 +15,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
 }
 
+MoogleEngine.Documents db = new MoogleEngine.Documents("../Content/");
 
 app.UseStaticFiles();
 

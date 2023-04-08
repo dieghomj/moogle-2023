@@ -48,6 +48,7 @@ namespace MoogleEngine.Algebra
         public double this[int i]{
  
             get{ return vector[i]; }
+            set{ vector[i] = value; }
  
         }
 
@@ -78,7 +79,7 @@ namespace MoogleEngine.Algebra
             double mod = 0;
             
             for(int i = 0; i < A.count; i++){
-                mod += (double)Math.Pow(A[i],2);
+                mod += A[i]*A[i];
             }
             
             return (double)Math.Sqrt(mod);

@@ -29,9 +29,7 @@
     private string query = "";
     private SearchResult result = new SearchResult();
 
-    public (MoogleEngine.Algebra.Matrix,Dictionary<string,int>) DB = new Documents("../Content/").GetDB;
-
     private void RunQuery() {
-        result = Moogle.Query(query,DB);
+        result = Moogle.Query(query);
     }
 }
