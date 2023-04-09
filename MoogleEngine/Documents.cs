@@ -14,6 +14,9 @@ namespace MoogleEngine
         private Dictionary<string,int> Vocabulary;
         
         public static Matrix TFIDF;
+        public static Dictionary<string,int> vocabulary; 
+        public static string[] Doc;
+        public static Vector idf;
 
         public Documents(string path){
 
@@ -31,7 +34,9 @@ namespace MoogleEngine
 
             this.ComputeDocuments();
 
-            TFIDF = TF;
+            TFIDF = this.TF;
+            vocabulary = this.Vocabulary;
+            Doc = this.directory;
 
         }
 
@@ -39,9 +44,10 @@ namespace MoogleEngine
 
             bool[] IsInDoc = new bool[this.words+1];
 
+            int document = 0;
+
             foreach( string file in directory){
 
-                int document = 0;
 
                 string text = ReadText(file);
                 string[] words = GetWords(text);
@@ -62,16 +68,19 @@ namespace MoogleEngine
                 
             }
 
-            for(int i = 0; i < this.TF.Size.rows; i++){
-                
-                Vector currentRow = new Vector(this.TF,i);
+            idf = this.IDF;
 
+            //CalculaIDF
+            for(int i = 0; i < IDF.Count; i++){
+                this.IDF[i] = Math.Log10((double)(this.documents)/(this.IDF[i]));
+            }
+
+            for(int i = 0; i < this.TF.Size.rows; i++){
+                Vector currentRow = new Vector(this.TF,i);
                 for(int j = 0; j < this.TF.Size.columns; j++){
-                    //Calcula IDF    
-                    this.IDF[j] = Math.Log((double)(this.documents)/(this.IDF[j]));
                     //Normaliza el TF
-                    NormalizeTF(TF[i,j],currentRow.MAX);
-                    //Calcula TFID
+                    this.TF[i,j] = NormalizeTF(TF[i,j],currentRow.MAX);
+                    //Calcula TFIDF
                     this.TF[i,j] *=  this.IDF[j];
                 }
             }
@@ -143,8 +152,6 @@ namespace MoogleEngine
 
         }
 
-        public static Vector CalculateTFIDF(){return new Vector(0);}
-
         private static string[] ReadDocuments(string path){
             return Directory.GetFiles(path,"*.txt");
         }
@@ -152,7 +159,7 @@ namespace MoogleEngine
             return File.ReadAllText(path,System.Text.Encoding.UTF8);
         }
 
-        private static string NormalForm(string s){
+        public static string NormalForm(string s){
             s = s.ToLower();
             s = Regex.Replace(s.Normalize( System.Text.NormalizationForm.FormD),@"[^a-zA-z0-9]+","");
             s = Regex.Replace(s,@"[.,;:?!`¨'¡-]?",string.Empty);
