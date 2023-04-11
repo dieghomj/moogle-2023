@@ -13,10 +13,10 @@ namespace MoogleEngine
         private int words;
         private Dictionary<string,int> Vocabulary;
         
-        public static Matrix TFIDF;
-        public static Dictionary<string,int> vocabulary; 
-        public static string[] Doc;
-        public static Vector idf;
+        public static Matrix _TFIDF = new Matrix(0,0);
+        public static Dictionary<string,int> _Vocabulary; 
+        public static string[] Doc = new string[0];
+        public static Vector _IDF = new Vector();
 
         public Documents(string path){
 
@@ -29,20 +29,21 @@ namespace MoogleEngine
             foreach( string file in this.directory)documents++;
             this.documents = documents;
             
-            this.TF = new Matrix(this.documents+1,this.words+1);
-            this.IDF = new Vector(new double[words+1]);
+            this.TF = new Matrix(this.documents,this.words);
+            this.IDF = new Vector(new double[words]);
+            _IDF = new Vector(new double[words]);
 
             this.ComputeDocuments();
 
-            TFIDF = this.TF;
-            vocabulary = this.Vocabulary;
+            _TFIDF = this.TF;
+            _Vocabulary = this.Vocabulary;
             Doc = this.directory;
 
         }
 
         public void ComputeDocuments(){
 
-            bool[] IsInDoc = new bool[this.words+1];
+            bool[] IsInDoc = new bool[this.words];
 
             int document = 0;
 
@@ -54,13 +55,13 @@ namespace MoogleEngine
  
                 Vector tf = CalculateTF(words,Vocabulary);
 
-                for(int i = 0; i < this.words+1; i++){
+                for(int i = 0; i < this.words; i++){
                     TF[document,i] = tf[i];
                 }
 
                 bool[] idf = WordsInDoc(words,Vocabulary);
 
-                for(int i = 0; i < this.words + 1; i++){
+                for(int i = 0; i < this.words ; i++){
                     if(idf[i])IDF[i]++;
                 }
             
@@ -68,7 +69,10 @@ namespace MoogleEngine
                 
             }
 
-            idf = this.IDF;
+
+            for(int i = 0; i < IDF.Count; i++){
+                _IDF[i] = IDF[i];
+            }
 
             //CalculaIDF
             for(int i = 0; i < IDF.Count; i++){
@@ -79,7 +83,7 @@ namespace MoogleEngine
                 Vector currentRow = new Vector(this.TF,i);
                 for(int j = 0; j < this.TF.Size.columns; j++){
                     //Normaliza el TF
-                    this.TF[i,j] = NormalizeTF(TF[i,j],currentRow.MAX);
+                    // this.TF[i,j] = NormalizeTF(TF[i,j],currentRow.MAX);
                     //Calcula TFIDF
                     this.TF[i,j] *=  this.IDF[j];
                 }
@@ -131,7 +135,9 @@ namespace MoogleEngine
         }
 
         public static double NormalizeTF(double tf, double max){
-           return 0.5f + 0.5f * (tf/max);
+            if(tf == 0)return 0f;
+            if (max == 0) return 0f;
+            return 0.5f + 0.5f * (tf/max);
         }
 
         public static bool[] WordsInDoc(string[] words, Dictionary<string,int> vocabulary){

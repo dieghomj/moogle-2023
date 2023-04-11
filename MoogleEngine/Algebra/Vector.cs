@@ -4,7 +4,7 @@ namespace MoogleEngine.Algebra
     {
         private double[] vector;
         private int count;
-
+        
         private double max;
 
 
@@ -12,7 +12,7 @@ namespace MoogleEngine.Algebra
  
             this.vector = vector;
             count = vector.Length;
-            max = this.vector.Max();
+            // max = this.vector.Max();
         }
 
         public Vector(Matrix M, int row = -1, int column = -1){
@@ -84,6 +84,10 @@ namespace MoogleEngine.Algebra
             
             return (double)Math.Sqrt(mod);
         
+        }
+
+        public void Sort(){
+            Array.Sort(vector);
         }
 
         public double Max(){
