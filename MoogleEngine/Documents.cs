@@ -97,6 +97,8 @@ namespace MoogleEngine
             int cnt = 0;
 
             foreach( string file in directory){
+
+
                 
                 string text = ReadText(file);
                 string[] words = GetWords(text);
@@ -175,6 +177,24 @@ namespace MoogleEngine
         private static string[] GetWords(string text){
             char[] separator = { ' ', '\n', '\r', '\t', '\v', '\b', '\f'};
             return text.Split(separator,StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        public static string GetTitle(string directory){
+            string raw = directory.Remove(directory.Length-4);
+            raw = raw.Remove(0,11);
+            string[] words = GetWords(raw);
+            // raw = NormalForm(raw);
+            
+
+            string title;
+            if(words != null)title = words[0];
+            else title = raw;
+
+            foreach(string word in words){
+                title+= " " + word;
+            }
+
+            return title;
         }
 
     }
