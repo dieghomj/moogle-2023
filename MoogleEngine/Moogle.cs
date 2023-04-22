@@ -50,6 +50,12 @@ public static class Moogle
 
         int d = 0;
 
+
+        if(mod == 0){
+            SearchItem[] exc = {new SearchItem($"No se pudo encontrar nada relacionado con {query}","lo sentimos",0)};
+            return new SearchResult(exc,query);
+        } 
+
         for(int i = 0; i < Scores.Length; i++){
 
             Vector doc = new Vector(TFIDF,i);
@@ -57,7 +63,7 @@ public static class Moogle
             double docMod = Vector.Module(doc);
 
             Scores[i] = Vector.DotProduct(tfidf,doc)/(docMod*mod);
-            if (Scores[i] == 0)d++;
+            if (Scores[i] == 0 || Scores[i] == double.NaN)d++;
         }
 
         string[] KeyDocs = new string[Documents.Doc.Length];
@@ -70,14 +76,13 @@ public static class Moogle
         SearchItem[] items = new SearchItem[KeyDocs.Length - d];
 
         for(int i = Scores.Length - 1; i >= 0; i--){
-            if(Scores[i] == 0)break;
+            if(Scores[i] == 0 || Scores[i] == double.NaN)break;
 
             string title = KeyDocs[i].Remove(KeyDocs[i].Length-4);
             title = title.Remove(0,11);
 
-            items[Scores.Length - 1 - i] = new SearchItem(title," lorem ipsum ",(float)Scores[i]);
+            items[Scores.Length - 1 - i] = new SearchItem(Documents.GetTitle(KeyDocs[i])," lorem ipsum ",(float)Scores[i]);
         }
-
 
         return new SearchResult(items, query);
     }
