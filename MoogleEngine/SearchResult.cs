@@ -4,7 +4,7 @@ public class SearchResult
 {
     private SearchItem[] items;
 
-    public SearchResult(SearchItem[] items, string suggestion="")
+    public SearchResult(SearchItem[] items, string? suggestion="")
     {
         if (items == null) {
             throw new ArgumentNullException("items");
@@ -18,7 +18,7 @@ public class SearchResult
 
     }
 
-    public string Suggestion { get; private set; }
+    public string? Suggestion { get; private set; }
 
     public IEnumerable<SearchItem> Items() {
         return this.items;

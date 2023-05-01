@@ -174,8 +174,8 @@ namespace MoogleEngine
             return s;
         }
 
-        private static string[] GetWords(string text){
-            char[] separator = { ' ', '\n', '\r', '\t', '\v', '\b', '\f'};
+        public static string[] GetWords(string text){
+            char[] separator = { ' ', '\n', '\r', '\t', '\v', '\b', '\f' ,'_',};
             return text.Split(separator,StringSplitOptions.RemoveEmptyEntries);
         }
 
@@ -186,9 +186,8 @@ namespace MoogleEngine
             // raw = NormalForm(raw);
             
 
-            string title;
-            if(words != null)title = words[0];
-            else title = raw;
+            string title = "";
+            if(words == null)title = raw;
 
             foreach(string word in words){
                 title+= " " + word;
@@ -196,6 +195,19 @@ namespace MoogleEngine
 
             return title;
         }
+
+        public static int EditDistance(string a, string b){
+
+        int distance = 0;
+
+        for(int i = 0; i < Math.Min(a.Length,b.Length); i++){
+            if(a[i] != b[i])distance++;
+        }
+
+        distance += Math.Abs(a.Length-b.Length);
+        return distance;
+
+    }
 
     }
 }
