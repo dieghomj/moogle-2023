@@ -2,19 +2,9 @@
 
 ![](moogle.png)
 
-> Proyecto de Programación I.
-> Facultad de Matemática y Computación - Universidad de La Habana.
-> Cursos 2021, 2022.
+## Algoritmo de búsqueda
 
-Moogle! es una aplicación *totalmente original* cuyo propósito es buscar inteligentemente un texto en un conjunto de documentos.
-
-Es una aplicación web, desarrollada con tecnología .NET Core 6.0, específicamente usando Blazor como *framework* web para la interfaz gráfica, y en el lenguaje C#.
-La aplicación está dividida en dos componentes fundamentales:
-
-- `MoogleServer` es un servidor web que renderiza la interfaz gráfica y sirve los resultados.
-- `MoogleEngine` es una biblioteca de clases donde está... ehem... casi implementada la lógica del algoritmo de búsqueda.
-
-Hasta el momento hemos logrado implementar gran parte de la interfaz gráfica (que es lo fácil), pero nos está causando graves problemas la lógica. Aquí es donde entras tú.
+![](Project.png)
 
 ## Tu misión
 
