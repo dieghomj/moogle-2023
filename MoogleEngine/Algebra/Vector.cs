@@ -41,8 +41,6 @@ namespace MoogleEngine.Algebra
 
             }
 
-            max = this.vector.Max();
-
         }
         
         public double this[int i]{
