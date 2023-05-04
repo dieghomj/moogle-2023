@@ -11,19 +11,21 @@ namespace MoogleEngine
         private string[] directory;
         private int documents;
         private int words;
+        private long[] WordsPerDocument;
         private Dictionary<string,int> Vocabulary;
-        
+
         public static Matrix _TFIDF = new Matrix(0,0);
         public static Dictionary<string,int> _Vocabulary; 
         public static string[] Doc = new string[0];
         public static Vector _IDF = new Vector();
+        public static long[] _WordsPerDocument = new long[0];
 
         public Documents(string path){
 
             this.path = path;
             int documents = 0;
             
-            this.directory = ReadDocuments(this.path);
+            this.directory = GetDocuments(this.path);
             this.Vocabulary = GetVocabulary();
 
             foreach( string file in this.directory)documents++;
@@ -44,6 +46,7 @@ namespace MoogleEngine
         public void ComputeDocuments(){
 
             bool[] IsInDoc = new bool[this.words];
+            this.WordsPerDocument = new long[this.documents];
 
             int document = 0;
 
@@ -54,6 +57,9 @@ namespace MoogleEngine
                 string[] words = GetWords(text);
  
                 Vector tf = CalculateTF(words,Vocabulary);
+
+                for(int i = 0; i < tf.Count; i++)this.WordsPerDocument[document] += (int)tf[i];
+                _WordsPerDocument = this.WordsPerDocument;
 
                 for(int i = 0; i < this.words; i++){
                     TF[document,i] = tf[i];
@@ -82,8 +88,6 @@ namespace MoogleEngine
             for(int i = 0; i < this.TF.Size.rows; i++){
                 Vector currentRow = new Vector(this.TF,i);
                 for(int j = 0; j < this.TF.Size.columns; j++){
-                    //Normaliza el TF
-                    // this.TF[i,j] = NormalizeTF(TF[i,j],currentRow.MAX);
                     //Calcula TFIDF
                     this.TF[i,j] *=  this.IDF[j];
                 }
@@ -97,8 +101,6 @@ namespace MoogleEngine
             int cnt = 0;
 
             foreach( string file in directory){
-
-
                 
                 string text = ReadText(file);
                 string[] words = GetWords(text);
@@ -111,7 +113,6 @@ namespace MoogleEngine
                         
                     }
                 }
-
             }
 
             this.words = cnt;
@@ -120,27 +121,29 @@ namespace MoogleEngine
 
         }
 
-        public  (Matrix,Dictionary<string,int> ) GetDB{
-            get{ return (TF,Vocabulary); }
-        }
-
         public static Vector CalculateTF( string[] words, Dictionary<string,int> vocabulary){
             
             double[] A = new double[vocabulary.Count+1];
 
+
             foreach(string word in words){
-                A[vocabulary[NormalForm(word)]]++;
+                int wordIndex = vocabulary[NormalForm(word)];
+                A[wordIndex]++;
             }
 
-            return new Vector(A);
+            Vector result = new Vector(A);
+            result.Max();
+
+            foreach(string word in words){
+                int wordIndex = vocabulary[NormalForm(word)];
+                if(result[wordIndex] < 1)continue;
+                result[wordIndex] /= result.MAX;
+            }
+
+            return result;
 
         }
 
-        public static double NormalizeTF(double tf, double max){
-            if(tf == 0)return 0f;
-            if (max == 0) return 0f;
-            return 0.5f + 0.5f * (tf/max);
-        }
 
         public static bool[] WordsInDoc(string[] words, Dictionary<string,int> vocabulary){
                 
@@ -160,10 +163,10 @@ namespace MoogleEngine
 
         }
 
-        private static string[] ReadDocuments(string path){
+        public static string[] GetDocuments(string path){
             return Directory.GetFiles(path,"*.txt");
         }
-        private static string ReadText(string path){
+        public static string ReadText(string path){
             return File.ReadAllText(path,System.Text.Encoding.UTF8);
         }
 
