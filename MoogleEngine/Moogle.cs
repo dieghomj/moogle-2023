@@ -11,6 +11,7 @@ public static class Moogle
         Dictionary<string,int> vocabulary = Documents._Vocabulary;
         Vector tfidf = new Vector(new double[vocabulary.Count]);
         Vector idf = Documents._IDF;
+        // Vector tf = new Vector(new double[vocabulary.])
 
 
         string[] words = Documents.GetWords(query);
@@ -20,13 +21,14 @@ public static class Moogle
         words[0] = query;
         }
 
-        string? suggestion = Suggestion(words);
+        string? suggestion = OperatorsAndUtils.Suggestion(words);
+        suggestion = suggestion.Remove(0,1);
         if(suggestion == query)suggestion = null;
 
         bool[] mk = new bool[vocabulary.Count]; //Para marcar las palabras ya contadas mientras se calcula el IDF
 
 
-        for(int i = 0; i < words.Length; i++){ // Agrega los terminos de la query al TF-IDF
+        for(int i = 0; i < words.Length; i++){ // Agrega los terminos de la query al IDF
             string word = words[i];
             string s = Documents.NormalForm(word);
             
@@ -35,12 +37,14 @@ public static class Moogle
 
             mk[vocabulary[s]] = true;
             idf[vocabulary[s]]++;
-            tfidf[vocabulary[s]]++;
+            // tfidf[vocabulary[s]]++;
 
         }
 
-        for(int i = 0; i < tfidf.Count; i++){//Calcula el TF-IDF
-            // tfidf[i] = Documents.NormalizeTF(tfidf[i],MAX);
+        tfidf = Documents.CalculateTF(words,vocabulary);    
+        
+
+        for(int i = 0; i < idf.Count; i++){//Calcula el TF-IDF
             idf[i] = Math.Log10((double)(Documents.Doc.Length)/idf[i]);
             tfidf[i] *= idf[i];
         }
@@ -79,46 +83,10 @@ public static class Moogle
         for(int i = Scores.Length - 1; i >= 0; i--){
             if(Scores[i] == 0 || Scores[i] == double.NaN)break;
 
-            string title = documents[i].Remove(documents[i].Length-4);
-            title = title.Remove(0,11);
-
-            items[Scores.Length - 1 - i] = new SearchItem(Documents.GetTitle(documents[i]),"snippet",(float)Scores[i]);
+            items[Scores.Length - 1 - i] = new SearchItem(Documents.GetTitle(documents[i]),OperatorsAndUtils.Snippet(),(float)Scores[i]);
         }
 
         return new SearchResult(items, suggestion);
-    }
-
-    // private static string Snippet()
-    // {
-    //     throw new NotImplementedException();
-    // }
-
-    private static string Suggestion(string[] query){
-
-        Dictionary<string,int> vocabulary = Documents._Vocabulary;
-
-        string sugg = "";
-
-        for(int i = 0; i < query.Length; i++){
-            
-            int c = int.MaxValue;
-            string temp_sugg = "";
-            
-            foreach(string term in vocabulary.Keys){
-             
-                int edit_distance = Documents.EditDistance(term,Documents.NormalForm(query[i]));
-                
-                c = Math.Min(edit_distance,c);
-                
-                if(c == edit_distance){
-                    temp_sugg = term;
-                }
-            
-            }
-            sugg+= " " + temp_sugg;
-        }
-        return sugg;
-
     }
   
 }

@@ -123,21 +123,21 @@ namespace MoogleEngine
 
         public static Vector CalculateTF( string[] words, Dictionary<string,int> vocabulary){
             
-            double[] A = new double[vocabulary.Count+1];
-
+            double[] A = new double[vocabulary.Count];
+            double max = 0;
 
             foreach(string word in words){
                 int wordIndex = vocabulary[NormalForm(word)];
                 A[wordIndex]++;
+                max = Math.Max(A[wordIndex],max);
             }
 
             Vector result = new Vector(A);
-            result.Max();
 
             foreach(string word in words){
                 int wordIndex = vocabulary[NormalForm(word)];
                 if(result[wordIndex] < 1)continue;
-                result[wordIndex] /= result.MAX;
+                result[wordIndex] /= max;
             }
 
             return result;

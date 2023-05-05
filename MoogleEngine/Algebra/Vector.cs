@@ -12,7 +12,6 @@ namespace MoogleEngine.Algebra
  
             this.vector = vector;
             count = vector.Length;
-            // max = this.vector.Max();
         }
 
         public Vector(Matrix M, int row = -1, int column = -1){
