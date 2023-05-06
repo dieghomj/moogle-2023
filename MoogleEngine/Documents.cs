@@ -127,6 +127,7 @@ namespace MoogleEngine
             double max = 0;
 
             foreach(string word in words){
+                if(!vocabulary.ContainsKey(word))continue;
                 int wordIndex = vocabulary[NormalForm(word)];
                 A[wordIndex]++;
                 max = Math.Max(A[wordIndex],max);
@@ -135,6 +136,7 @@ namespace MoogleEngine
             Vector result = new Vector(A);
 
             foreach(string word in words){
+                if(!vocabulary.ContainsKey(word))continue;
                 int wordIndex = vocabulary[NormalForm(word)];
                 if(result[wordIndex] < 1)continue;
                 result[wordIndex] /= max;
