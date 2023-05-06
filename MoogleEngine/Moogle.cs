@@ -5,7 +5,7 @@ namespace MoogleEngine;
 
 public static class Moogle
 {
-    public static SearchResult Query(string query) {
+    public static SearchResult Query(string query,bool suggested = false, string NotFound = "") {
         
         Matrix TFIDF = Documents._TFIDF;
         Dictionary<string,int> vocabulary = Documents._Vocabulary;
@@ -54,8 +54,7 @@ public static class Moogle
         double[] Scores = new double[Documents.Doc.Length];//Donde se guardara el score de cada documento
      
         if(mod == 0){// Si el modulo del TF-IDF es 0 significa que ningun termino de la query esta en el corpus, por lo tanto no hay coincidencias
-            SearchItem[] exc = {new SearchItem($"No se pudo encontrar nada relacionado con {query}","lo sentimos",0)};
-            return new SearchResult(exc,suggestion);
+            return Query(suggestion,true,query);
         } 
 
         int NotRelevant = 0;//Contador para los documentos no relevantes
@@ -71,6 +70,7 @@ public static class Moogle
             if (Scores[i] == 0 || Scores[i] == double.NaN)NotRelevant++;
         }
 
+
         string[] documents = new string[Documents.Doc.Length];
         for(int i = 0; i < Documents.Doc.Length; i++){
             if(Scores[i] == 0)continue;
@@ -78,12 +78,15 @@ public static class Moogle
         }
 
         Array.Sort(Scores,documents);
-        SearchItem[] items = new SearchItem[documents.Length - NotRelevant];
+        int notFoundMsg = 0;
+        if(suggested == true)notFoundMsg = 1;
+        SearchItem[] items = new SearchItem[documents.Length + notFoundMsg - NotRelevant];
+        items[0] = new SearchItem($"Resultados encontrados con {query}",$"No se ha encontrado nada relacionado con {NotFound}",10);
 
         for(int i = Scores.Length - 1; i >= 0; i--){
             if(Scores[i] == 0 || Scores[i] == double.NaN)break;
 
-            items[Scores.Length - 1 - i] = new SearchItem(Documents.GetTitle(documents[i]),OperatorsAndUtils.Snippet(),(float)Scores[i]);
+            items[(Scores.Length -1) - i + notFoundMsg ] = new SearchItem(Documents.GetTitle(documents[i]),OperatorsAndUtils.Snippet(),(float)Scores[i]);
         }
 
         return new SearchResult(items, suggestion);
