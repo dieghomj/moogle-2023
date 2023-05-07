@@ -8,13 +8,27 @@
 
 Simple motor de búsqueda con simple interfaz gráfica.
 
+## Instrucciones para correr el proyecto
+
+* **Abir una terminal en la carpeta del proyecto.**
+
+  **Linux**:
+
+  * ```make dev```
+
+  **Windows**:
+
+  * ```dotnet run --project```
+
 ## Arquitectura del proyecto
 
 Aceptando la mision que se me fue otorgada, ayude en la implementacion de **Moogle**!. Para ello tuve en cuenta la informacion que me pudieron proporcionar acerca de "**TF-IDF**" y "**Algebra lineal**". Tambien me fue util este link <https://en.wikipedia.org/wiki/Tf%E2%80%93idf>
 
+![Grafico de procesos](Project.png)
+>Orden de los procesos del proyecto.
 ### **Cargando los documentos**
 
-Lo primero que implemente fue una clase que nombre `Documents` que contiene varios metodos relacionados con operaciones que se le pueden a hacer a documentos, por ejemplo el metodo `Documents.ReadText()` el cual retorna como string toda el texto de un .txt. Lo mas importante de esta clase es su constructor:
+Lo primero que implemente fue una clase que nombre `Documents` esta contiene varios metodos relacionados con operaciones que se le pueden a hacer a documentos, por ejemplo el metodo `Documents.ReadText()` el cual retorna como string toda el texto de un .txt. Lo mas importante de esta clase es su constructor:
 
 ```cs
     public Documents(string path){
@@ -48,7 +62,7 @@ En las clases `Algebra.Vector` y `Algebra.Matrix` estan implementados en metodos
 
 Luego de implementar estas clases, arregle la clase `Moogle` la cual en su momento no era muy util. El objetivo principal de esta clase es responder a la query a traves del metodo `Moogle.Query`. La idea para este metodo es modelar un vector en el que cada componente de este, sea el TF-IDF de cada termino que pertenezca al corpus de documentos. Luego hallar el coseno entre este vector y cada uno de los vectores creados a partir de los documentos.
 
-Primero guardo en variables el TF-IDF, el IDF y el vocabulario previamentes calculados al cargar los documentos. 
+Primero guardo en variables el TF-IDF, el IDF y el vocabulario previamentes calculados al cargar los documentos.
 
 ```cs
     Matrix TFIDF = Documents._TFIDF;
@@ -56,17 +70,42 @@ Primero guardo en variables el TF-IDF, el IDF y el vocabulario previamentes calc
     Dictionary<string,int> vocabulary = Documents._Vocabulary;
 ```
 
-Luego calcula el TF-IDF de cada termino a partir de la query:
+Luego calcula el TF-IDF de cada termino en la query, en caso de un termino de la query no encontrarse en `vocabulary` sera ignorado:
 
 ```cs
-    tfidf = Documents.CalculateTF(words,vocabulary);    
+
+    tfidf = Documents.CalculateTF(query,vocabulary); 
+
     for(int i = 0; i < idf.Count; i++){
-        idf[i] = Math.Log10((double)(Documents.Doc.Length)/idf[i]);
         tfidf[i] *= idf[i];
     }
+
 ```
 
+Se almacena luego en `tfidf` que es una variable tipo `Algebra.Vector` para luego calcular el Producto Punto entre `tfidf` y  cada uno de los vectores construidos a partir de la matriz `TFIDF` en esta linea:
 
+```cs
+    Vector currentDocTFIDF = new Vector(TFIDF,i);
+```
 
-![Grafico de procesos](Project.png)
->Orden de los procesos del proyecto.
+El Producto Punto se calcula con el metodo `Algebra.Vector.DotProduct` que hace pues exactamente lo que su nombre indica. Luego el resultado del calculo sera el `score` de su respectivo documento. Luego los documentos son ordenados con el metodo `Array.Sort` dependiendo de su respectivo `score`. En caso de que el `score` de un documento sea `0` es ignorado pues no tiene relevancia alguna con la query.
+
+Luego se construye un `SearchResult` a partir de esta informacion guardada en `items`.
+
+```cs
+
+    return new SearchResult(items, suggestion);
+
+```
+
+Despues puede ver el resultado en su navegador.
+
+### **Las Sugerencias**
+
+Para las sugerencias use el algoritmo de [Distancia de Levenshtein](https://es.wikipedia.org/wiki/Distancia_de_Levenshtein). El calcula de forma dinamica el número mínimo de operaciones requeridas para transformar una cadena de caracteres en otra. El metodo para esto es `Documents.EditDistance`.
+
+Al recibir una query la sugerencia se calcula dentro del metodo `Utils.Suggestion` que por cada termino guardado en `vocabulary` calcula su respectiva Distancia de Levenshtein con respecto a la query.
+
+En caso de que no se encuentre ningun termino relacionado con query, `Moogle.Query` retornara los documentos relacionados con la sugerencia.
+
+![Resultados busqueda](Resultados.png)
