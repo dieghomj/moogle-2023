@@ -21,7 +21,7 @@ public static class Moogle
         words[0] = query;
         }
 
-        string? suggestion = OperatorsAndUtils.Suggestion(words);
+        string? suggestion = Utils.Suggestion(words);
         suggestion = suggestion.Remove(0,1);
         if(suggestion == query)suggestion = null;
 
@@ -48,11 +48,11 @@ public static class Moogle
             tfidf[i] *= idf[i];
         }
 
-        double mod = Vector.Module(tfidf);//Calcula el modulo del TF-IDF
+        double queryMod = Vector.Module(tfidf);//Calcula el modulo del TF-IDF
 
         double[] Scores = new double[Documents.Doc.Length];//Donde se guardara el score de cada documento
      
-        if(mod == 0){// Si el modulo del TF-IDF es 0 significa que ningun termino de la query esta en el corpus, por lo tanto no hay coincidencias
+        if(queryMod == 0){// Si el modulo del TF-IDF es 0 significa que ningun termino de la query esta en el corpus, por lo tanto no hay coincidencias
             return Query(suggestion,true,query);
         } 
 
@@ -60,11 +60,11 @@ public static class Moogle
 
         for(int i = 0; i < Scores.Length; i++){
 
-            Vector doc = new Vector(TFIDF,i);
+            Vector currentDocTFIDF = new Vector(TFIDF,i);
 
-            double docMod = Vector.Module(doc);
+            double docMod = Vector.Module(currentDocTFIDF);
 
-            Scores[i] = Vector.DotProduct(tfidf,doc)/(docMod*mod);
+            Scores[i] = Vector.DotProduct(tfidf,currentDocTFIDF)/(docMod*queryMod);
 
             if (Scores[i] == 0 || Scores[i] == double.NaN)NotRelevant++;
         }
@@ -85,7 +85,7 @@ public static class Moogle
         for(int i = Scores.Length - 1; i >= 0; i--){
             if(Scores[i] == 0 || Scores[i] == double.NaN)break;
 
-            items[(Scores.Length -1) - i + notFoundMsg ] = new SearchItem(Documents.GetTitle(documents[i]),OperatorsAndUtils.Snippet(),(float)Scores[i]);
+            items[(Scores.Length -1) - i + notFoundMsg ] = new SearchItem(Documents.GetTitle(documents[i]),Utils.Snippet(),(float)Scores[i]);
         }
 
         return new SearchResult(items, suggestion);

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MoogleEngine
 {
-    public class OperatorsAndUtils
+    public class Utils
     {
     public static string Snippet()
     {   return "snippet";
