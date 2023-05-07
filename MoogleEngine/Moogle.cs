@@ -43,7 +43,6 @@ public static class Moogle
 
         tfidf = Documents.CalculateTF(words,vocabulary);    
         
-
         for(int i = 0; i < idf.Count; i++){//Calcula el TF-IDF
             idf[i] = Math.Log10((double)(Documents.Doc.Length)/idf[i]);
             tfidf[i] *= idf[i];
