@@ -26,6 +26,7 @@ Aceptando la mision que se me fue otorgada, ayude en la implementacion de **Moog
 
 ![Grafico de procesos](Project.png)
 >Orden de los procesos del proyecto.
+>
 ### **Cargando los documentos**
 
 Lo primero que implemente fue una clase que nombre `Documents` esta contiene varios metodos relacionados con operaciones que se le pueden a hacer a documentos, por ejemplo el metodo `Documents.ReadText()` el cual retorna como string toda el texto de un .txt. Lo mas importante de esta clase es su constructor:
