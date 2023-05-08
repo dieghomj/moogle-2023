@@ -9,8 +9,8 @@ namespace MoogleEngine
         private Vector IDF;
         private string path;
         private string[] directory;
-        private int documents;
-        private int words;
+        private int totalDocuments;
+        private int totalWords;
         private long[] WordsPerDocument;
         private Dictionary<string, int> Vocabulary;
 
@@ -24,17 +24,18 @@ namespace MoogleEngine
         {
 
             this.path = path;
-            int documents = 0;
+            int totalDocuments = 0;
 
             this.directory = GetDocuments(this.path);
             this.Vocabulary = GetVocabulary();
 
-            foreach (string file in this.directory) documents++;
-            this.documents = documents;
+            foreach (string file in this.directory) totalDocuments++;
+            this.totalDocuments = this.directory.Length;
+            this.totalDocuments = totalDocuments;
 
-            this.TF = new Matrix(this.documents, this.words);
-            this.IDF = new Vector(new double[words]);
-            _IDF = new Vector(new double[words]);
+            this.TF = new Matrix(this.totalDocuments, this.totalWords);
+            this.IDF = new Vector(new double[totalWords]);
+            _IDF = new Vector(new double[totalWords]);
 
             this.ComputeDocuments();
 
@@ -47,10 +48,10 @@ namespace MoogleEngine
         public void ComputeDocuments()
         {
 
-            bool[] IsInDoc = new bool[this.words];
-            this.WordsPerDocument = new long[this.documents];
+            bool[] IsInDoc = new bool[this.totalWords];
+            this.WordsPerDocument = new long[this.totalDocuments];
 
-            int document = 0;
+            int documentIndex = 0;
 
             foreach (string file in directory)
             {
@@ -61,22 +62,22 @@ namespace MoogleEngine
 
                 Vector tf = CalculateTF(words, Vocabulary);
 
-                for (int i = 0; i < tf.Count; i++) this.WordsPerDocument[document] += (int)tf[i];
+                for (int i = 0; i < tf.Count; i++) this.WordsPerDocument[documentIndex] += (int)tf[i];
                 _WordsPerDocument = this.WordsPerDocument;
 
-                for (int i = 0; i < this.words; i++)
+                for (int i = 0; i < this.totalWords; i++)
                 {
-                    TF[document, i] = tf[i];
+                    TF[documentIndex, i] = tf[i];
                 }
 
-                bool[] idf = WordsInDoc(words, Vocabulary);
+                bool[] wordmk = WordsInDoc(words, Vocabulary);
 
-                for (int i = 0; i < this.words; i++)
+                for (int i = 0; i < this.totalWords; i++)
                 {
-                    if (idf[i]) IDF[i]++;
+                    if (wordmk[i]) IDF[i]++;
                 }
 
-                document++;
+                documentIndex++;
 
             }
 
@@ -87,10 +88,12 @@ namespace MoogleEngine
             }
 
             //CalculaIDF
-            for (int i = 0; i < IDF.Count; i++)
-            {
-                this.IDF[i] = CapIDF(Math.Log10((double)(this.documents) / (this.IDF[i])));
-            }
+            this.IDF = CalculateIDF(this.IDF, this.totalDocuments);
+
+            // for (int i = 0; i < IDF.Count; i++)
+            // {
+            //     this.IDF[i] = CapIDF(Math.Log10((double)(this.totalDocuments) / (this.IDF[i])));
+            // }
 
             for (int i = 0; i < this.TF.Size.rows; i++)
             {
@@ -128,7 +131,7 @@ namespace MoogleEngine
                 }
             }
 
-            this.words = cnt;
+            this.totalWords = cnt;
 
             return Vocabulary;
 
@@ -162,6 +165,15 @@ namespace MoogleEngine
 
         }
 
+        public static Vector CalculateIDF(Vector idf, int totalDocuments)
+        {
+            for (int i = 0; i < idf.Count; i++)
+           {    
+                if(idf[i] == 0)continue;
+                idf[i] = CapIDF(Math.Log10((double)totalDocuments / (idf[i])));
+            }
+            return idf;
+        }
 
         public static bool[] WordsInDoc(string[] words, Dictionary<string, int> vocabulary)
         {
@@ -226,8 +238,9 @@ namespace MoogleEngine
             return title;
         }
 
-        public static double CapIDF(double idf){
-            if(idf < Math.Log10(100f/85f))return 0;
+        public static double CapIDF(double idf)
+        {
+            if (idf < Math.Log10(100f / 85f)) return 0;
             else return idf;
         }
 
@@ -263,7 +276,7 @@ namespace MoogleEngine
                                 d[i - 1, j - 1] + costo);                     //Sustitucion
                 }
             }
-            return d[m,n];
+            return d[m, n];
         }
     }
 }

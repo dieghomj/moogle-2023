@@ -21,7 +21,7 @@ public static class Moogle
         words[0] = query;
         }
 
-        string suggestion = Utils.Suggestion(words);
+        string? suggestion = Utils.Suggestion(words);
         suggestion = suggestion.Remove(0,1);
         if(suggestion == query)suggestion = null;
 
@@ -40,11 +40,13 @@ public static class Moogle
             // tfidf[vocabulary[s]]++;
 
         }
+        int x = vocabulary["harry"]; int y = vocabulary["potter"];
 
         tfidf = Documents.CalculateTF(words,vocabulary);    
+        idf = Documents.CalculateIDF(idf,Documents.Doc.Length + 1);
         
         for(int i = 0; i < idf.Count; i++){//Calcula el TF-IDF
-            idf[i] = Documents.CapIDF(Math.Log10((double)(Documents.Doc.Length + 1)/idf[i]));
+            // idf[i] = Documents.CapIDF(Math.Log10((double)(Documents.Doc.Length + 1)/idf[i]));
             tfidf[i] *= idf[i];
         }
 
