@@ -7,7 +7,7 @@ public static class Moogle
 {
     public static SearchResult Query(string query,bool suggested = false, string NotFound = "") {
         
-        Matrix TFIDF = Documents._TFIDF;
+        Matrix _TFIDF = Documents._TFIDF;
         Dictionary<string,int> vocabulary = Documents._Vocabulary;
         Vector tfidf = new Vector(new double[vocabulary.Count]);
         Vector idf = Documents._IDF;
@@ -42,8 +42,8 @@ public static class Moogle
         }
         int x = vocabulary["harry"]; int y = vocabulary["potter"];
 
-        tfidf = Documents.CalculateTF(words,vocabulary);    
-        idf = Documents.CalculateIDF(idf,Documents.Doc.Length + 1);
+        tfidf = TFIDF.CalculateTF(words,vocabulary);    
+        idf = TFIDF.CalculateIDF(idf,Documents.Doc.Length + 1);
         
         for(int i = 0; i < idf.Count; i++){//Calcula el TF-IDF
             // idf[i] = Documents.CapIDF(Math.Log10((double)(Documents.Doc.Length + 1)/idf[i]));
@@ -62,7 +62,7 @@ public static class Moogle
 
         for(int i = 0; i < Scores.Length; i++){
 
-            Vector currentDocTFIDF = new Vector(TFIDF,i);
+            Vector currentDocTFIDF = new Vector(_TFIDF,i);
 
             double docMod = Vector.Module(currentDocTFIDF);
 
