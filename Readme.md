@@ -18,7 +18,7 @@ Simple motor de búsqueda con simple interfaz gráfica.
 
   **Windows**:
 
-  * ```dotnet run --project```
+  * ```dotnet watch run --project MoogleServer```
 
 ## Arquitectura del proyecto
 
@@ -103,7 +103,7 @@ Despues puede ver el resultado en su navegador.
 
 ### **Las Sugerencias**
 
-Para las sugerencias use el algoritmo de [Distancia de Levenshtein](https://es.wikipedia.org/wiki/Distancia_de_Levenshtein). El calcula de forma dinamica el número mínimo de operaciones requeridas para transformar una cadena de caracteres en otra. El metodo para esto es `Documents.EditDistance`.
+Para las sugerencias use el algoritmo de [Distancia de Levenshtein](https://es.wikipedia.org/wiki/Distancia_de_Levenshtein). Este calcula de forma dinamica el número mínimo de operaciones requeridas para transformar una cadena de caracteres en otra. El metodo para esto es `Documents.EditDistance`.
 
 Al recibir una query la sugerencia se calcula dentro del metodo `Utils.Suggestion` que por cada termino guardado en `vocabulary` calcula su respectiva Distancia de Levenshtein con respecto a la query.
 
