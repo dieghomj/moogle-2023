@@ -21,7 +21,7 @@ public static class Moogle
         words[0] = query;
         }
 
-        string? suggestion = Utils.Suggestion(words);
+        string suggestion = Utils.Suggestion(words);
         suggestion = suggestion.Remove(0,1);
         if(suggestion == query)suggestion = null;
 
@@ -44,7 +44,7 @@ public static class Moogle
         tfidf = Documents.CalculateTF(words,vocabulary);    
         
         for(int i = 0; i < idf.Count; i++){//Calcula el TF-IDF
-            idf[i] = Math.Log10((double)(Documents.Doc.Length)/idf[i]);
+            idf[i] = Documents.CapIDF(Math.Log10((double)(Documents.Doc.Length + 1)/idf[i]));
             tfidf[i] *= idf[i];
         }
 
@@ -52,7 +52,7 @@ public static class Moogle
 
         double[] Scores = new double[Documents.Doc.Length];//Donde se guardara el score de cada documento
      
-        if(queryMod == 0){// Si el modulo del TF-IDF es 0 significa que ningun termino de la query esta en el corpus, por lo tanto no hay coincidencias
+        if(queryMod == 0){// Si el modulo del TF-IDF es 0 significa que ningun termino de la query no esta en el corpus, por lo tanto no hay coincidencias
             return Query(suggestion,true,query);
         } 
 

@@ -89,7 +89,7 @@ namespace MoogleEngine
             //CalculaIDF
             for (int i = 0; i < IDF.Count; i++)
             {
-                this.IDF[i] = Math.Log10((double)(this.documents) / (this.IDF[i]));
+                this.IDF[i] = CapIDF(Math.Log10((double)(this.documents) / (this.IDF[i])));
             }
 
             for (int i = 0; i < this.TF.Size.rows; i++)
@@ -224,6 +224,11 @@ namespace MoogleEngine
             }
 
             return title;
+        }
+
+        public static double CapIDF(double idf){
+            if(idf < Math.Log10(100f/85f))return 0;
+            else return idf;
         }
 
         public static int EditDistance(string s, string t)
