@@ -8,7 +8,7 @@ namespace MoogleEngine
     public class OperatorsAndUtils
     {
     public static string Snippet()
-    {   return "snippet";
+    {   return "Tempor consectetur non ipsum in tempor elit. Id proident velit anim aliqua dolore est nostrud exercitation excepteur esse nulla amet dolor. Sunt magna anim eu ea culpa est labore aliqua officia est qui. Dolore commodo occaecat tempor excepteur dolore mollit non veniam laborum do amet culpa et. Ut nulla deserunt incididunt mollit Lorem dolore excepteur ullamco occaecat voluptate duis pariatur. Exercitation et aliquip cupidatat ex ex dolor ut nostrud.";
     //     foreach(string word in words){
     //         if(word.Length<4)continue;
     //         if(!index.ContainsKey((i,Documents.NormalForm(word))))continue;
