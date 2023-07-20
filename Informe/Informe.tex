@@ -55,27 +55,27 @@
 \end{flushleft}
 
 \begin{verbatim}
-	public Documents(string path){
+public Documents(string path){
 
-            this.path = path;
-            int documents = 0;
-            
-            this.directory = GetDocuments(this.path);
-            this.Vocabulary = GetVocabulary();
-            
-            foreach( string file in this.directory)documents++;
-            this.documents = documents;
-            
-            this.TF = new Matrix(this.documents,this.words);
-            this.IDF = new Vector(new double[words]);
-            _IDF = new Vector(new double[words]);
+        this.path = path;
+        int documents = 0;
+        
+        this.directory = GetDocuments(this.path);
+        this.Vocabulary = GetVocabulary();
+        
+        foreach( string file in this.directory)documents++;
+        this.documents = documents;
+        
+        this.TF = new Matrix(this.documents,this.words);
+        this.IDF = new Vector(new double[words]);
+        _IDF = new Vector(new double[words]);
 
-            this.ComputeDocuments();
+        this.ComputeDocuments();
 
-            _TFIDF = this.TF;
-            _Vocabulary = this.Vocabulary;
-            Doc = this.directory;
-	}
+        _TFIDF = this.TF;
+        _Vocabulary = this.Vocabulary;
+        Doc = this.directory;
+}
 \end{verbatim}
 
 \begin{flushleft}
@@ -95,6 +95,8 @@
         $
         \mathrm{TF}(t,d) = \frac{f_{t,d}}{\max\{f_{t',d}:t' \in d\}}\hspace{20pt}
         \mathrm{IDF}(t,D) = \log \frac{N}{|\{d \in D: t \in d\}|}\linebreak
+        $
+        $
         \mathrm{TF\text{-}IDF}(t,d,D) = \mathrm{TF}(t,d) \cdot \mathrm{IDF}(t,D)
         $
     \end{large}
@@ -111,9 +113,9 @@
 \begin{flushleft}
     \begin{verbatim}
         
-    Matrix TFIDF = Documents._TFIDF;
-    Vector idf = Documents._IDF;
-    Dictionary<string,int> vocabulary = Documents._Vocabulary;
+Matrix TFIDF = Documents._TFIDF;
+Vector idf = Documents._IDF;
+Dictionary<string,int> vocabulary = Documents._Vocabulary;
     
     \end{verbatim}
 
@@ -121,12 +123,11 @@
 
     \begin{verbatim}
         
-        tfidf = Documents.CalculateTF(query,vocabulary);
+tfidf = Documents.CalculateTF(query,vocabulary);
 
-        for(int i = 0; i < idf.Count; i++){
-        tfidf[i] *= idf[i];
-    
-    }
+for(int i = 0; i < idf.Count; i++){
+    tfidf[i] *= idf[i];
+}
 
     \end{verbatim}
 
