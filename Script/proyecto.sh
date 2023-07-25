@@ -49,6 +49,7 @@ open_pdf(){
 }
 # clean: eliminar todos los ficheros auxiliares que no forman parte del contenido del repositorio y se generan en la compilación o ejecución del proyecto, o en la generación de los pdfs del reporte o la presentación
 clean(){
+    find . -type f -name '*.pdf' -delete
     find . -type f -name '*.aux' -delete
     find . -type f -name '*.fdb_latexmk' -delete
     find . -type f -name '*.fls' -delete
@@ -62,7 +63,37 @@ clean(){
     echo "All auxiliary files have been deleted"
 }
 
+echo "
+COMMANDS: 
+
+run: Ejecutar el proyecto
+
+report: Compilar y generar el pdf del proyecto latex relativo al informe
+
+slides: Compilar y generar el pdf del proyecto latex relativo a la presentacion
+
+show_report: Ejecutar un programa para visualizar el informe. Evince por defecto, puede tener como argumento otro programa para visualizar pdf
+
+show_slides: Ejecutar un programa para visualizar la presentacion. Evince por defecto, puede tener como argumento otro programa para visualizar pdf
+    
+    "
+
 while read command ; do 
+
+    echo "
+COMMANDS: 
+
+run: Ejecutar el proyecto
+
+report: Compilar y generar el pdf del proyecto latex relativo al informe
+
+slides: Compilar y generar el pdf del proyecto latex relativo a la presentacion
+
+show_report: Ejecutar un programa para visualizar el informe. Evince por defecto, puede tener como argumento otro programa para visualizar pdf
+
+show_slides: Ejecutar un programa para visualizar la presentacion. Evince por defecto, puede tener como argumento otro programa para visualizar pdf
+    
+    "
 
     case $command in 
         run)
