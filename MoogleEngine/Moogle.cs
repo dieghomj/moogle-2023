@@ -1,4 +1,5 @@
-﻿using MoogleEngine.Algebra;
+﻿using System.Diagnostics;
+using MoogleEngine.Algebra;
 namespace MoogleEngine;
 
 
@@ -7,10 +8,31 @@ public static class Moogle
 {
     public static SearchResult Query(string query,bool suggested = false, string NotFound = "") {
         
-        Matrix TFIDF = Documents._TFIDF;
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        Console.WriteLine("Ansewring query...");
+
+        const int documentsLimit = 10;
+
+
+        Matrix TFIDF = new Matrix(Documents._TFIDF.Size.rows,Documents._TFIDF.Size.columns);
         Dictionary<string,int> vocabulary = Documents._Vocabulary;
         Vector tfidf = new Vector(new double[vocabulary.Count]);
-        Vector idf = Documents._IDF;
+        Vector idf = new Vector(new double[Documents._IDF.Count]);
+
+
+        //Initializing TFIDF and idf
+        for(int i = 0; i < Documents._TFIDF.Size.rows; i++){
+            for(int j = 0; j < Documents._TFIDF.Size.columns; j++){
+                TFIDF[i,j] = Documents._TFIDF[i,j]; 
+            }
+        }
+
+        for(int i = 0; i < idf.Count; i++){
+            idf[i] = Documents._IDF[i];
+        }
+        //+++++++++++++++++++++++++++=
+
         // Vector tf = new Vector(new double[vocabulary.])
 
 
@@ -23,7 +45,7 @@ public static class Moogle
 
         string? suggestion = OperatorsAndUtils.Suggestion(words);
         suggestion = suggestion.Remove(0,1);
-        if(suggestion == query)suggestion = null;
+        // if(suggestion == query)suggestion = null;
 
         bool[] mk = new bool[vocabulary.Count]; //Para marcar las palabras ya contadas mientras se calcula el IDF
 
@@ -44,7 +66,9 @@ public static class Moogle
         tfidf = Documents.CalculateTF(words,vocabulary);    
         
         for(int i = 0; i < idf.Count; i++){//Calcula el TF-IDF
-            idf[i] = Math.Log10((double)(Documents.Doc.Length)/idf[i]);
+            if(idf[i]!=0){
+            idf[i] = Math.Log10(Documents.Doc.Length / idf[i]);
+            }
             tfidf[i] *= idf[i];
         }
 
@@ -69,12 +93,15 @@ public static class Moogle
             if (Scores[i] == 0 || Scores[i] == double.NaN)NotRelevant++;
         }
 
-
+        TimeSpan ts = stopwatch.Elapsed;
+        Console.WriteLine($"({ts.Minutes}m {ts.Seconds}s)This documents should respond to the query({query}): ");
         string[] documents = new string[Documents.Doc.Length];
         for(int i = 0; i < Documents.Doc.Length; i++){
             if(Scores[i] == 0)continue;
             documents[i] = Documents.Doc[i];
+            Console.WriteLine(documents[i]);
         }
+        Console.WriteLine($"{documents.Length - NotRelevant} documents found");
 
         Array.Sort(Scores,documents);
         int notFoundMsg = 0;
@@ -84,9 +111,13 @@ public static class Moogle
 
         for(int i = Scores.Length - 1; i >= 0; i--){
             if(Scores[i] == 0 || Scores[i] == double.NaN)break;
-
-            items[(Scores.Length -1) - i + notFoundMsg ] = new SearchItem(Documents.GetTitle(documents[i]),OperatorsAndUtils.Snippet(),(float)Scores[i]);
+            items[Scores.Length -1 - i + notFoundMsg ] = new SearchItem(Documents.GetTitle(documents[i]),OperatorsAndUtils.Snippet(words,documents[i]),(float)Scores[i]);
+            // if(Scores.Length - 1 - documentsLimit == i)break;
         }
+
+        stopwatch.Stop();
+        ts = stopwatch.Elapsed;
+        Console.WriteLine("Query completly responded in " + ts.Minutes + "m " + ts.Seconds + "s");
 
         return new SearchResult(items, suggestion);
     }

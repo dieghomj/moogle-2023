@@ -7,23 +7,67 @@ namespace MoogleEngine
 {
     public class OperatorsAndUtils
     {
-    public static string Snippet()
-    {   return "Tempor consectetur non ipsum in tempor elit. Id proident velit anim aliqua dolore est nostrud exercitation excepteur esse nulla amet dolor. Sunt magna anim eu ea culpa est labore aliqua officia est qui. Dolore commodo occaecat tempor excepteur dolore mollit non veniam laborum do amet culpa et. Ut nulla deserunt incididunt mollit Lorem dolore excepteur ullamco occaecat voluptate duis pariatur. Exercitation et aliquip cupidatat ex ex dolor ut nostrud.";
-    //     foreach(string word in words){
-    //         if(word.Length<4)continue;
-    //         if(!index.ContainsKey((i,Documents.NormalForm(word))))continue;
+    public static string Snippet(string[] query, string doc)
+    {       
+        
+        string snippet = "";
+        foreach(string s in query){
+            // Console.WriteLine(Documents._Vocabulary[s]);
+            // Console.WriteLine(Documents._IDF[Documents._Vocabulary[s]]);
+            if(!Documents._Vocabulary.ContainsKey(s) || Documents._IDF[Documents._Vocabulary[s]] == 0)
+                continue;
+
+            int leftSpace = 200;
+            int rightSpace = 300; 
+            string text = Documents.ReadText(doc);
+
+            int index = FindWord(s,text);
+            if(index != -1){
+                if(index - leftSpace < 0)index += leftSpace;
+                snippet += " " + GetSubstring(text,index-leftSpace,rightSpace) + "...";
+                return snippet;
+            }
             
-    //         int pos = index[(i,Documents.NormalForm(word))];
-    //         string snippet = File.ReadAllText(document);
-    //         snippet.Remove(pos + 15);
-    //         snippet.Remove(0,pos-15);
-    //         return snippet;
-    //     }   
-    //     return "No hay suficiente texto para mostrar";
+        }
+        return snippet;
     }
 
-    public static string Suggestion(string[] query){
+        private static string GetSubstring(string text, int left, int right)
+        {
+            string substring = "";
 
+            for(int i = left; i <= left+right; i++){
+                if(i + 1 >= text.Length)return substring;
+                substring+=text[i];
+            }
+            return substring;
+        }
+
+        private static int FindWord(string word, string text)
+        {
+            string[] t =  text.Split(" ",StringSplitOptions.None);
+            int realIndex = 0;
+
+
+            for (int i = 0; i < t.Length; i++)
+            {
+                
+                // Console.WriteLine("this is " + t[i]);
+
+                string? s = t[i];
+                realIndex += s.Length + 1;
+                string w = Documents.NormalForm(s);
+
+                if(word == w){
+
+                // Console.WriteLine(">>>>" + word + "==" + w + "Index: " + i + "Real? Index: " + realIndex);
+                    return realIndex;
+                }
+            }
+            return -1;
+        }
+
+        public static string Suggestion(string[] query){
         Dictionary<string,int> vocabulary = Documents._Vocabulary;
 
         string sugg = "";
@@ -32,7 +76,6 @@ namespace MoogleEngine
             
             int c = int.MaxValue;
             string temp_sugg = "";
-            
             foreach(string term in vocabulary.Keys){
              
                 int edit_distance = Documents.EditDistance(term,Documents.NormalForm(query[i]));

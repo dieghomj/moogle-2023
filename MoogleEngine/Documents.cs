@@ -46,9 +46,8 @@ namespace MoogleEngine
 
         public void ComputeDocuments()
         {
-
-            bool[] IsInDoc = new bool[this.words];
-            this.WordsPerDocument = new long[this.documents];
+            _ = new bool[words];
+            WordsPerDocument = new long[documents];
 
             int document = 0;
 
@@ -61,8 +60,8 @@ namespace MoogleEngine
 
                 Vector tf = CalculateTF(words, Vocabulary);
 
-                for (int i = 0; i < tf.Count; i++) this.WordsPerDocument[document] += (int)tf[i];
-                _WordsPerDocument = this.WordsPerDocument;
+                for (int i = 0; i < tf.Count; i++) WordsPerDocument[document] += (int)tf[i];
+                _WordsPerDocument = WordsPerDocument;
 
                 for (int i = 0; i < this.words; i++)
                 {
@@ -83,22 +82,29 @@ namespace MoogleEngine
 
             for (int i = 0; i < IDF.Count; i++)
             {
+                //Capping results
+                if(IDF[i] >= (documents*0.70f))
+                {
+                    IDF[i] = 0;
+                }
+                //
                 _IDF[i] = IDF[i];
             }
 
             //CalculaIDF
             for (int i = 0; i < IDF.Count; i++)
             {
-                this.IDF[i] = Math.Log10((double)(this.documents) / (this.IDF[i]));
+                if(IDF[i]!=0)
+                IDF[i] = Math.Log10(documents / IDF[i]);
             }
 
-            for (int i = 0; i < this.TF.Size.rows; i++)
+            for (int i = 0; i < TF.Size.rows; i++)
             {
-                Vector currentRow = new Vector(this.TF, i);
-                for (int j = 0; j < this.TF.Size.columns; j++)
+                _ = new Vector(TF, i);
+                for (int j = 0; j < TF.Size.columns; j++)
                 {
                     //Calcula TFIDF
-                    this.TF[i, j] *= this.IDF[j];
+                    TF[i, j] *= IDF[j];
                 }
             }
 
@@ -128,7 +134,7 @@ namespace MoogleEngine
                 }
             }
 
-            this.words = cnt;
+            words = cnt;
 
             return Vocabulary;
 
