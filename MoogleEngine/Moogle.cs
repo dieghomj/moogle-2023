@@ -107,12 +107,20 @@ public static class Moogle
         int notFoundMsg = 0;
         if(suggested == true)notFoundMsg = 1;
         SearchItem[] items = new SearchItem[documents.Length + notFoundMsg - NotRelevant];
-        items[0] = new SearchItem($"Resultados encontrados con {query}",$"No se ha encontrado nada relacionado con {NotFound}",10);
-
-        for(int i = Scores.Length - 1; i >= 0; i--){
+        Console.WriteLine(items.Length);
+        if (items.Length <= 0)
+        {
+            Console.WriteLine("This is working");
+            Array.Resize(ref items, 1);
+        }
+        
+        items[0] = new SearchItem($"Resultados encontrados con {query}", $"No se ha encontrado nada relacionado con {NotFound}", 10);
+        
+        for (int i = Scores.Length - 1; i >= 0; i--){
+            // if(i > items.Length - 1)break;
             if(Scores[i] == 0 || Scores[i] == double.NaN)break;
             items[Scores.Length -1 - i + notFoundMsg ] = new SearchItem(Documents.GetTitle(documents[i]),OperatorsAndUtils.Snippet(words,documents[i]),(float)Scores[i]);
-            // if(Scores.Length - 1 - documentsLimit == i)break;
+            // if(Scores.Length - 1 - docume ntsLimit == i)break;
         }
 
         stopwatch.Stop();

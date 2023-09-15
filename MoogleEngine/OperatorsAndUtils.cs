@@ -14,17 +14,22 @@ namespace MoogleEngine
         foreach(string s in query){
             // Console.WriteLine(Documents._Vocabulary[s]);
             // Console.WriteLine(Documents._IDF[Documents._Vocabulary[s]]);
-            if(!Documents._Vocabulary.ContainsKey(s) || Documents._IDF[Documents._Vocabulary[s]] == 0)
+
+            string   w = Documents.NormalForm(s);
+
+            if(!Documents._Vocabulary.ContainsKey(w) || Documents._IDF[Documents._Vocabulary[w]] == 0)
                 continue;
 
-            int leftSpace = 200;
+            int leftSpace = 50;
             int rightSpace = 300; 
             string text = Documents.ReadText(doc);
 
-            int index = FindWord(s,text);
+            int index = FindWord(Documents.NormalForm(w),text);
+
             if(index != -1){
                 if(index - leftSpace < 0)index += leftSpace;
                 snippet += " " + GetSubstring(text,index-leftSpace,rightSpace) + "...";
+                // Console.WriteLine(snippet);
                 return snippet;
             }
             
